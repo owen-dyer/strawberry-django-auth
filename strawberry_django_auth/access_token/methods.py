@@ -20,7 +20,6 @@ class AccessToken:
     # Also, add this in later because I'm lazy rn lol
     # def create_payload(self) -> Dict[]:
     #     pass
-
     def create(subject: str) -> AccessTokenType:
         payload = {
             'sub': subject,
@@ -52,4 +51,9 @@ class AccessToken:
             token=encode(payload_type)
         )
     
-    
+    def verify(token: str) -> bool:
+        try:
+            payload = decode(token)
+            return True
+        except Exception as e:
+            return False

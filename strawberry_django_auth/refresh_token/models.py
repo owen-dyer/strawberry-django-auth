@@ -1,38 +1,44 @@
 import secrets
 import uuid
+from datetime import datetime, timezone
 
 from django.db import models
 from django.conf import settings
 
 
 class RefreshToken(models.Model):
+    def generate():
+        # Need to add setting for the number of bytes/length
+        return secrets.token_hex(16)
+
     # Primary key for refresh token
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
-        editable=False
+        editable=False,
     )
     # User refresh token is assigned to
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='refresh_tokens',
-        related_query_name='refresh_token'
+        related_query_name='refresh_token',
     )
     # Refresh token
     token = models.CharField(
         max_length=255,
         unique=True,
-        editable=False
+        editable=False,
+        default=generate,
     )
     # Creation timestamp for this token
     iat = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
     # Revocation timestamp for this token
     exp = models.DateTimeField(
         blank=True,
-        null=True
+        null=True,
     )
 
     def __str__(self):
@@ -47,11 +53,17 @@ class RefreshToken(models.Model):
 
         super().save(*args, **kwargs)
 
-    def generate(self):
-        # Need to add setting for the number of bytes/length
-        return secrets.token_hex(16)
-
     def get(self):
         if hasattr(self, '_cached_token'):
             return self._cached_token
         return self.token
+
+    def revoke(self, token: str):
+        self.exp = datetime.now(timezone.utc)
+        self.save()
+
+    def rotate(self, token: str):
+        self.revoke(token)
+        RefreshToken.objects.create(
+            user=self.user,
+        )

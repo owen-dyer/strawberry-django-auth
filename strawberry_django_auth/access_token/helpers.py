@@ -2,7 +2,10 @@ from typing import Any, Dict
 import jwt
 
 from strawberry_django_auth.settings import app_settings
-from strawberry_django_auth.access_token.types import PayloadType
+from strawberry_django_auth.access_token.types import (
+    PayloadType,
+    SubjectType,
+)
 
 
 def encode(payload: PayloadType) -> str:
@@ -22,10 +25,15 @@ def decode(token: str) -> PayloadType:
             options={
                 'verify_signature': app_settings.VERIFY,
                 'verify_exp': app_settings.EXPIRATION,
+                'verify_iat': app_settings.ISSUED_AT,
             },
             leeway=0,
         )
     )
 
-def get_token_from_header(header: Dict[str, Any]) -> str:
-    pass
+
+def get_token_subject(payload: Dict[str, Any]) -> SubjectType | None:
+    print(f'Payload: {payload}')
+    return SubjectType(
+        subject=payload['sub'],
+    ) or None

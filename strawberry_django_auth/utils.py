@@ -30,29 +30,6 @@ def create_argument_type(arg_type: type[Any], **options):
     return arg_type
 
 
-# TODO: fix this. it is always returning none for token!
-def get_http_authorization(context):
-    req = get_context(context)
-    if isinstance(req, HttpRequest):
-        headers = req.headers
-        token = headers.get(app_settings.AUTH_HEADER_NAME, None)
-    else:
-        req = cast(dict, req)
-        raw_headers = list[tuple[bytes, bytes]] = req['headers']
-        for k, v in raw_headers:
-            if k == app_settings.AUTH_HEADER_NAME:
-                token = v.decode()
-                break
-    if token:
-        print(token)
-        return token.strip(app_settings.AUTH_HEADER_TYPES)
-    return None
-
-
-def get_credentials(request, **kwargs):
-    return get_http_authorization(request)
-
-
 # need to put this into graphql view and then can prob change a lot of code uggg but its the intended way...
 def get_context(info: HttpRequest | Info[Any, Any] | GraphQLResolveInfo) -> Any:
     if hasattr(info, 'context'):

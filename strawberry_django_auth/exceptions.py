@@ -26,3 +26,11 @@ class AccessTokenExpired(TokenAuthError):
         'message': message,
         'exception_code': exception_code,
     }]
+
+class InvalidCredentials(TokenAuthError):
+    message = _('Unable to authenticate the provided credentials')
+    exception_code = _('invalid_credentials')
+    gql_exception = [{
+        'message': message,
+        'exception_code': exception_code,
+    }]

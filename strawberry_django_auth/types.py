@@ -13,7 +13,7 @@ class LoginInput:
     username: str
     password: str
 
-@strawberry_django.type
+@strawberry.type
 class TokenType:
     success: bool = False
     access_token: Optional[access_token_types.AccessTokenType]

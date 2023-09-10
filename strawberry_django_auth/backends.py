@@ -1,26 +1,26 @@
-from strawberry_django_auth.utils import get_credentials
-from strawberry_django_auth.tokens.utils import (
-    get_user_by_token,
-    get_user_by_token_async,
+from django.contrib.auth.backends import BaseBackend
+from strawberry_django_auth.helpers import (
+    get_header,
 )
 
-class TokenAuthBackend:
-    def authenticate(self, request=None, **kwargs):
-        if request is None or getattr(request, "token_auth", False):
-            return None
-        token = get_credentials(request, **kwargs)
-        print(f'In tokenauth backend. Token: {token}')
-        if token is not None:
-            return get_user_by_token(token, request)
-        return None
+from strawberry_django_auth.settings import app_settings
 
-    async def authenticate_async(self, request=None, **kwargs):
-        if request is None or getattr(request, "token_auth", False):
+from strawberry_django_auth.access_token.helpers import (
+    decode,
+    get_token_subject,
+)
+
+
+class TokenAuthBackend(BaseBackend):
+    def authenticate(self, request=None):
+        access_token = get_header(request, app_settings.AUTH_HEADER_NAME)
+        if access_token is None:
             return None
-        token = get_credentials(request, **kwargs)
-        if token is not None:
-            return await get_user_by_token_async(token, request)
-        return None
+        print(f'Access Token: {access_token}')
+        payload = decode(access_token)
+        if payload is None:
+            return None
+        return get_token_subject(payload)
 
     def get_user(self, user_id):
         return None
