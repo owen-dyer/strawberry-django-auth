@@ -1,5 +1,13 @@
 # Strawberry Django Auth
 
-This app is a pluggable authentication/authorization app for Django using Strawberry GraphQL.
-Instead of the server managing the state of someone's session, an access token with a pre-determined lifetime will be issued upon successful authentication.
-This allows for stateless authorization, meaning that there is less strain on the server and database since no queries will need to be made to verify that a token is valid.
+Authentication/Authorization app for [Django](https://www.djangoproject.com/) powered by [Strawberry GraphQL](https://strawberry.rocks/) and [PyJWT](https://pypi.org/project/PyJWT/)
+
+# About
+This library allows you to export all authentication logic out of your project, and to import only what you want to use into your project. Using JWTs, the server is able to
+handle user sessions without maintaining records of the session on the server. This also allows the server to verify a user without making queries to the database.
+
+# Features
+- [x] Works with Django's default user model or a custom one
+- [x] Built in exception codes which are returned in the response
+- [x] Easily customize JWT (claims, verification, algorithm)
+- [x] Refresh tokens with customizable settings (expiry, rotation, families)
